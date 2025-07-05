@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +31,7 @@
             padding: 20px;
             text-align: center;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .header h1 {
@@ -55,7 +56,7 @@
             font-size: 1.1em;
             font-weight: bold;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .tab.active {
@@ -66,14 +67,14 @@
 
         .tab:hover {
             transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
         }
 
         .content {
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             display: none;
         }
 
@@ -128,7 +129,7 @@
 
         .word-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             border-color: #667eea;
         }
 
@@ -294,11 +295,11 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
+
             .word-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .tabs {
                 flex-direction: column;
                 align-items: center;
@@ -306,6 +307,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -378,7 +380,8 @@
                     </div>
                     <div class="form-group" id="agreementGroup" style="display: none;">
                         <label for="agreement">Accord de l'adjectif</label>
-                        <textarea id="agreement" name="agreement" rows="3" placeholder="Ex: beau → belle (féminin), beaux (masculin pluriel), belles (féminin pluriel)"></textarea>
+                        <textarea id="agreement" name="agreement" rows="3"
+                            placeholder="Ex: beau → belle (féminin), beaux (masculin pluriel), belles (féminin pluriel)"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="week">Semaine d'apprentissage</label>
@@ -395,49 +398,59 @@
     </div>
 
     <script>
-        // Base de données des mots
-        let vocabulary = [
-            // Semaine 1
-            { word: "un ami", nature: "nom commun", gender: "masculin", plural: "des amis", week: 1 },
-            { word: "maman", nature: "nom commun", gender: "féminin", plural: "des mamans", week: 1 },
-            { word: "un lapin", nature: "nom commun", gender: "masculin", plural: "des lapins", week: 1 },
-            { word: "mardi", nature: "nom propre", gender: "masculin", plural: "", week: 1 },
-            { word: "samedi", nature: "nom propre", gender: "masculin", plural: "", week: 1 },
-            { word: "un pirate", nature: "nom commun", gender: "masculin", plural: "des pirates", week: 1 },
-            { word: "il va", nature: "verbe", gender: "", plural: "", week: 1 },
-            { word: "la salade", nature: "nom commun", gender: "féminin", plural: "des salades", week: 1 },
-            { word: "avec", nature: "préposition", gender: "", plural: "", week: 1 },
-            
-            // Semaine 2
-            { word: "un jour", nature: "nom commun", gender: "masculin", plural: "des jours", week: 2 },
-            { word: "il se couche", nature: "verbe", gender: "", plural: "", week: 2 },
-            { word: "il roule", nature: "verbe", gender: "", plural: "", week: 2 },
-            { word: "une boule", nature: "nom commun", gender: "féminin", plural: "des boules", week: 2 },
-            { word: "il trouve", nature: "verbe", gender: "", plural: "", week: 2 },
-            { word: "pourquoi", nature: "adverbe", gender: "", plural: "", week: 2 },
-            { word: "un loup", nature: "nom commun", gender: "masculin", plural: "des loups", week: 2 },
-            { word: "un mouton", nature: "nom commun", gender: "masculin", plural: "des moutons", week: 2 },
-            { word: "la bouche", nature: "nom commun", gender: "féminin", plural: "des bouches", week: 2 }
-        ];
+        // === CONFIGURATION ===
+        const GOOGLE_SHEET_API = 'https://script.google.com/macros/s/AKfycbyofQ-RLUo4FiJSAOE5qqm1BwtQdVBFNejuADRkxWCxgZdcmmkp9X6WX6usRQOJwfw/exec'; // <-- Remplacez par l'URL de votre Apps Script déployé
 
+        let vocabulary = [];
         let currentWeek = 1;
+
+        // Charger la liste depuis Google Sheets
+        async function loadVocabulary() {
+            try {
+                const res = await fetch(GOOGLE_SHEET_API);
+                vocabulary = await res.json();
+            } catch (e) {
+                alert('Erreur de chargement du vocabulaire.');
+                vocabulary = [];
+            }
+        }
+
+        // Ajouter un mot via Google Sheets
+        async function addWordToSheet(newWord) {
+            const params = new URLSearchParams({ action: 'add', ...newWord });
+            const res = await fetch(GOOGLE_SHEET_API, {
+                method: 'POST',
+                body: params
+            });
+            return res.text();
+        }
+
+        // Supprimer un mot via Google Sheets
+        async function deleteWordFromSheet(word) {
+            const params = new URLSearchParams({ action: 'delete', word });
+            const res = await fetch(GOOGLE_SHEET_API, {
+                method: 'POST',
+                body: params
+            });
+            return res.text();
+        }
 
         // Fonction pour afficher les onglets
         function showTab(tabName) {
             // Cacher tous les contenus
             const contents = document.querySelectorAll('.content');
             contents.forEach(content => content.classList.remove('active'));
-            
+
             // Désactiver tous les onglets
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => tab.classList.remove('active'));
-            
+
             // Afficher le contenu sélectionné
             document.getElementById(tabName).classList.add('active');
-            
+
             // Activer l'onglet sélectionné
             event.target.classList.add('active');
-            
+
             // Charger le contenu selon l'onglet
             if (tabName === 'search') {
                 searchWords();
@@ -450,33 +463,43 @@
         function createWordCard(wordObj) {
             const card = document.createElement('div');
             card.className = 'word-card';
-            
+
             let genderHtml = '';
             if (wordObj.gender) {
                 genderHtml = `<span class="word-gender">${wordObj.gender}</span>`;
             }
-            
+
             let pluralHtml = '';
             if (wordObj.plural) {
                 pluralHtml = `<div class="word-plural"><strong>Pluriel:</strong> ${wordObj.plural}</div>`;
             }
-            
+
             let agreementHtml = '';
             if (wordObj.agreement) {
                 agreementHtml = `<div class="word-agreement"><strong>Accord:</strong> ${wordObj.agreement}</div>`;
             }
-            
+
+            // Utilisation d'un eventListener pour le bouton audio
             card.innerHTML = `
                 <div class="word-header">
                     <span class="word-text">${wordObj.word}</span>
-                    <button class="audio-btn" onclick="speakWord('${wordObj.word}')" title="Écouter">🔊</button>
+                    <div>
+                        <button class="audio-btn" title="Écouter">🔊</button>
+                    </div>
                 </div>
                 <div class="word-nature">${wordObj.nature}</div>
                 ${genderHtml}
                 ${pluralHtml}
                 ${agreementHtml}
             `;
-            
+
+            // Ajout du listener après création du bouton
+            const audioBtn = card.querySelector('.audio-btn');
+            audioBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                speakWord(wordObj.word);
+            });
+
             return card;
         }
 
@@ -496,22 +519,22 @@
         function searchWords() {
             const searchTerm = document.querySelector('.search-input').value.toLowerCase();
             const resultsContainer = document.getElementById('searchResults');
-            
+
             let filteredWords = vocabulary;
             if (searchTerm) {
-                filteredWords = vocabulary.filter(word => 
+                filteredWords = vocabulary.filter(word =>
                     word.word.toLowerCase().includes(searchTerm) ||
                     word.nature.toLowerCase().includes(searchTerm)
                 );
             }
-            
+
             resultsContainer.innerHTML = '';
-            
+
             if (filteredWords.length === 0) {
                 resultsContainer.innerHTML = '<div class="no-results">Aucun mot trouvé 😕</div>';
                 return;
             }
-            
+
             filteredWords.forEach(word => {
                 const card = createWordCard(word);
                 resultsContainer.appendChild(card);
@@ -521,23 +544,23 @@
         // Fonction pour afficher les mots de la semaine
         function showWeek(weekNumber) {
             currentWeek = weekNumber;
-            
+
             // Mettre à jour les boutons de semaine
             const weekButtons = document.querySelectorAll('.week-btn');
             weekButtons.forEach(btn => btn.classList.remove('active'));
             weekButtons[weekNumber - 1].classList.add('active');
-            
+
             // Filtrer les mots de la semaine
             const weekWords = vocabulary.filter(word => word.week === weekNumber);
             const container = document.getElementById('weeklyWords');
-            
+
             container.innerHTML = '';
-            
+
             if (weekWords.length === 0) {
                 container.innerHTML = '<div class="no-results">Aucun mot pour cette semaine 📅</div>';
                 return;
             }
-            
+
             weekWords.forEach(word => {
                 const card = createWordCard(word);
                 container.appendChild(card);
@@ -550,21 +573,21 @@
             const genderGroup = document.getElementById('genderGroup');
             const pluralGroup = document.getElementById('pluralGroup');
             const agreementGroup = document.getElementById('agreementGroup');
-            
+
             // Afficher le genre pour les noms et adjectifs
             if (nature === 'nom commun' || nature === 'nom propre' || nature === 'adjectif') {
                 genderGroup.style.display = 'block';
             } else {
                 genderGroup.style.display = 'none';
             }
-            
+
             // Afficher le pluriel pour les noms
             if (nature === 'nom commun' || nature === 'nom propre') {
                 pluralGroup.style.display = 'block';
             } else {
                 pluralGroup.style.display = 'none';
             }
-            
+
             // Afficher l'accord pour les adjectifs
             if (nature === 'adjectif') {
                 agreementGroup.style.display = 'block';
@@ -573,10 +596,10 @@
             }
         }
 
-        // Fonction pour ajouter un mot
-        document.getElementById('addWordForm').addEventListener('submit', function(e) {
+        // Remplacer la fonction d'ajout de mot
+        const addForm = document.getElementById('addWordForm');
+        addForm.addEventListener('submit', async function (e) {
             e.preventDefault();
-            
             const formData = new FormData(e.target);
             const newWord = {
                 word: formData.get('word'),
@@ -586,29 +609,48 @@
                 agreement: formData.get('agreement') || '',
                 week: parseInt(formData.get('week')) || null
             };
-            
-            // Vérifier si le mot existe déjà
-            const exists = vocabulary.some(word => word.word.toLowerCase() === newWord.word.toLowerCase());
-            if (exists) {
+            // Vérifier si le mot existe déjà côté client
+            if (vocabulary.some(word => word.word.toLowerCase() === newWord.word.toLowerCase())) {
                 alert('Ce mot existe déjà dans le vocabulaire !');
                 return;
             }
-            
-            // Ajouter le mot à la base de données
-            vocabulary.push(newWord);
-            
-            // Réinitialiser le formulaire
-            e.target.reset();
-            toggleGenderField();
-            
-            alert('Mot ajouté avec succès ! 🎉');
+            const result = await addWordToSheet(newWord);
+            if (result === 'ok') {
+                alert('Mot ajouté avec succès ! 🎉');
+                await loadVocabulary();
+                searchWords();
+                showWeek(currentWeek);
+                e.target.reset();
+                toggleGenderField();
+            } else if (result === 'exists') {
+                alert('Ce mot existe déjà dans le vocabulaire !');
+            } else {
+                alert('Erreur lors de l\'ajout du mot.');
+            }
         });
 
+        // Remplacer la fonction de suppression de mot
+        async function deleteWord(wordToDelete) {
+            if (!confirm('Voulez-vous vraiment supprimer ce mot ?')) return;
+            const result = await deleteWordFromSheet(wordToDelete);
+            if (result === 'ok') {
+                await loadVocabulary();
+                searchWords();
+                showWeek(currentWeek);
+            } else if (result === 'notfound') {
+                alert('Mot non trouvé.');
+            } else {
+                alert('Erreur lors de la suppression.');
+            }
+        }
+
         // Initialiser l'application
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function () {
+            await loadVocabulary();
             searchWords();
             showWeek(1);
         });
     </script>
 </body>
+
 </html>
