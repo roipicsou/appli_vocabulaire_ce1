@@ -399,41 +399,53 @@
 
     <script>
         // === CONFIGURATION ===
-        const CORS_PROXY = 'https://corsproxy.io/?';
-        const GOOGLE_SHEET_API = 'https://script.google.com/macros/s/AKfycbyofQ-RLUo4FiJSAOE5qqm1BwtQdVBFNejuADRkxWCxgZdcmmkp9X6WX6usRQOJwfw/exec'; // <-- Remplacez par l'URL de votre Apps Script déployé
+        const CSV_FILE = 'vocabulaire.csv'; // Le fichier CSV à charger
 
         let vocabulary = [];
         let currentWeek = 1;
 
-        // Charger la liste depuis Google Sheets
+        // Fonction pour parser un CSV en tableau d'objets
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            const headers = lines[0].split(',');
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                let obj = {};
+                headers.forEach((h, i) => obj[h.trim()] = values[i] ? values[i].trim() : '');
+                obj.week = Number(obj.week);
+                return obj;
+            });
+        }
+
+        // Fonction pour convertir le vocabulaire en CSV
+        function toCSV(data) {
+            if (!data.length) return '';
+            const headers = Object.keys(data[0]);
+            const rows = data.map(obj => headers.map(h => (obj[h] || '').replace(/"/g, '""')).join(','));
+            return headers.join(',') + '\n' + rows.join('\n');
+        }
+
+        // Charger la liste depuis le CSV
         async function loadVocabulary() {
             try {
-                const res = await fetch(CORS_PROXY + GOOGLE_SHEET_API);
-                vocabulary = await res.json();
+                const res = await fetch(CSV_FILE);
+                const csv = await res.text();
+                vocabulary = parseCSV(csv);
             } catch (e) {
                 alert('Erreur de chargement du vocabulaire.');
                 vocabulary = [];
             }
         }
 
-        // Ajouter un mot via Google Sheets
-        async function addWordToSheet(newWord) {
-            const params = new URLSearchParams({ action: 'add', ...newWord });
-            const res = await fetch(CORS_PROXY + GOOGLE_SHEET_API, {
-                method: 'POST',
-                body: params
-            });
-            return res.text();
-        }
-
-        // Supprimer un mot via Google Sheets
-        async function deleteWordFromSheet(word) {
-            const params = new URLSearchParams({ action: 'delete', word });
-            const res = await fetch(CORS_PROXY + GOOGLE_SHEET_API, {
-                method: 'POST',
-                body: params
-            });
-            return res.text();
+        // Importer un CSV
+        function importCSVFile(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                vocabulary = parseCSV(e.target.result);
+                searchWords();
+                showWeek(currentWeek);
+            };
+            reader.readAsText(file);
         }
 
         // Fonction pour afficher les onglets
@@ -618,7 +630,7 @@
             const result = await addWordToSheet(newWord);
             if (result === 'ok') {
                 alert('Mot ajouté avec succès ! 🎉');
-                await loadVocabulary();
+                // Mise à jour instantanée sans recharger le CSV
                 searchWords();
                 showWeek(currentWeek);
                 e.target.reset();
@@ -650,7 +662,22 @@
             await loadVocabulary();
             searchWords();
             showWeek(1);
+            // Ne pas ajouter de bouton de téléchargement CSV
         });
+        // Désactiver les fonctions d'ajout/suppression côté serveur, tout se fait en local
+        // Remplacer addWordToSheet et deleteWordFromSheet par des fonctions locales
+        async function addWordToSheet(newWord) {
+            vocabulary.push(newWord);
+            return 'ok';
+        }
+        async function deleteWordFromSheet(word) {
+            const index = vocabulary.findIndex(w => w.word === word);
+            if (index !== -1) {
+                vocabulary.splice(index, 1);
+                return 'ok';
+            }
+            return 'notfound';
+        }
     </script>
 </body>
 
