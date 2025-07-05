@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Vocabulaire CE1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            background: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.15);
+        }
+
+        .content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1.2em;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.5em;
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .word-card {
+            background: #f8f9ff;
+            border: 2px solid #eef1ff;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .word-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .word-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .audio-btn {
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .audio-btn:hover {
+            background: #ff5252;
+            transform: scale(1.1);
+        }
+
+        .word-nature {
+            display: inline-block;
+            background: #4ecdc4;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .word-gender {
+            display: inline-block;
+            background: #45b7d1;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 5px;
+        }
+
+        .word-plural {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff3cd;
+            border-radius: 10px;
+            font-style: italic;
+        }
+
+        .word-agreement {
+            margin-top: 10px;
+            padding: 10px;
+            background: #d1ecf1;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+
+        .add-word-form {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .week-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .week-btn {
+            background: #f1f3f4;
+            border: 2px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .week-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .week-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .word-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Mon Vocabulaire CE1</h1>
+            <p>Découvre et apprends de nouveaux mots !</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('search')">🔍 Rechercher</button>
+            <button class="tab" onclick="showTab('weekly')">📅 Mots de la semaine</button>
+            <button class="tab" onclick="showTab('add')">➕ Ajouter un mot</button>
+        </div>
+
+        <!-- Onglet Recherche -->
+        <div id="search" class="content active">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Cherche un mot..." onkeyup="searchWords()">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div id="searchResults" class="word-grid"></div>
+        </div>
+
+        <!-- Onglet Mots de la semaine -->
+        <div id="weekly" class="content">
+            <div class="week-selector">
+                <button class="week-btn active" onclick="showWeek(1)">Semaine 1</button>
+                <button class="week-btn" onclick="showWeek(2)">Semaine 2</button>
+            </div>
+            <div id="weeklyWords" class="word-grid"></div>
+        </div>
+
+        <!-- Onglet Ajouter un mot -->
+        <div id="add" class="content">
+            <div class="add-word-form">
+                <h2>Ajouter un nouveau mot</h2>
+                <form id="addWordForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="word">Mot *</label>
+                            <input type="text" id="word" name="word" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nature">Nature du mot *</label>
+                            <select id="nature" name="nature" required onchange="toggleGenderField()">
+                                <option value="">Choisir...</option>
+                                <option value="nom commun">Nom commun</option>
+                                <option value="nom propre">Nom propre</option>
+                                <option value="verbe">Verbe</option>
+                                <option value="adjectif">Adjectif</option>
+                                <option value="adverbe">Adverbe</option>
+                                <option value="préposition">Préposition</option>
+                                <option value="pronom">Pronom</option>
+                                <option value="déterminant">Déterminant</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" id="genderGroup" style="display: none;">
+                            <label for="gender">Genre</label>
+                            <select id="gender" name="gender">
+                                <option value="">Choisir...</option>
+                                <option value="masculin">Masculin</option>
+                                <option value="féminin">Féminin</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="pluralGroup" style="display: none;">
+                            <label for="plural">Pluriel</label>
+                            <input type="text" id="plural" name="plural">
+                        </div>
+                    </div>
+                    <div class="form-group" id="agreementGroup" style="display: none;">
+                        <label for="agreement">Accord de l'adjectif</label>
+                        <textarea id="agreement" name="agreement" rows="3" placeholder="Ex: beau → belle (féminin), beaux (masculin pluriel), belles (féminin pluriel)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="week">Semaine d'apprentissage</label>
+                        <select id="week" name="week">
+                            <option value="">Choisir...</option>
+                            <option value="1">Semaine 1</option>
+                            <option value="2">Semaine 2</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Ajouter le mot</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de données des mots
+        let vocabulary = [
+            // Semaine 1
+            { word: "un ami", nature: "nom commun", gender: "masculin", plural: "des amis", week: 1 },
+            { word: "maman", nature: "nom commun", gender: "féminin", plural: "des mamans", week: 1 },
+            { word: "un lapin", nature: "nom commun", gender: "masculin", plural: "des lapins", week: 1 },
+            { word: "mardi", nature: "nom propre", gender: "masculin", plural: "", week: 1 },
+            { word: "samedi", nature: "nom propre", gender: "masculin", plural: "", week: 1 },
+            { word: "un pirate", nature: "nom commun", gender: "masculin", plural: "des pirates", week: 1 },
+            { word: "il va", nature: "verbe", gender: "", plural: "", week: 1 },
+            { word: "la salade", nature: "nom commun", gender: "féminin", plural: "des salades", week: 1 },
+            { word: "avec", nature: "préposition", gender: "", plural: "", week: 1 },
+            
+            // Semaine 2
+            { word: "un jour", nature: "nom commun", gender: "masculin", plural: "des jours", week: 2 },
+            { word: "il se couche", nature: "verbe", gender: "", plural: "", week: 2 },
+            { word: "il roule", nature: "verbe", gender: "", plural: "", week: 2 },
+            { word: "une boule", nature: "nom commun", gender: "féminin", plural: "des boules", week: 2 },
+            { word: "il trouve", nature: "verbe", gender: "", plural: "", week: 2 },
+            { word: "pourquoi", nature: "adverbe", gender: "", plural: "", week: 2 },
+            { word: "un loup", nature: "nom commun", gender: "masculin", plural: "des loups", week: 2 },
+            { word: "un mouton", nature: "nom commun", gender: "masculin", plural: "des moutons", week: 2 },
+            { word: "la bouche", nature: "nom commun", gender: "féminin", plural: "des bouches", week: 2 }
+        ];
+
+        let currentWeek = 1;
+
+        // Fonction pour afficher les onglets
+        function showTab(tabName) {
+            // Cacher tous les contenus
+            const contents = document.querySelectorAll('.content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Désactiver tous les onglets
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Afficher le contenu sélectionné
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activer l'onglet sélectionné
+            event.target.classList.add('active');
+            
+            // Charger le contenu selon l'onglet
+            if (tabName === 'search') {
+                searchWords();
+            } else if (tabName === 'weekly') {
+                showWeek(currentWeek);
+            }
+        }
+
+        // Fonction pour créer une carte de mot
+        function createWordCard(wordObj) {
+            const card = document.createElement('div');
+            card.className = 'word-card';
+            
+            let genderHtml = '';
+            if (wordObj.gender) {
+                genderHtml = `<span class="word-gender">${wordObj.gender}</span>`;
+            }
+            
+            let pluralHtml = '';
+            if (wordObj.plural) {
+                pluralHtml = `<div class="word-plural"><strong>Pluriel:</strong> ${wordObj.plural}</div>`;
+            }
+            
+            let agreementHtml = '';
+            if (wordObj.agreement) {
+                agreementHtml = `<div class="word-agreement"><strong>Accord:</strong> ${wordObj.agreement}</div>`;
+            }
+            
+            card.innerHTML = `
+                <div class="word-header">
+                    <span class="word-text">${wordObj.word}</span>
+                    <button class="audio-btn" onclick="speakWord('${wordObj.word}')" title="Écouter">🔊</button>
+                </div>
+                <div class="word-nature">${wordObj.nature}</div>
+                ${genderHtml}
+                ${pluralHtml}
+                ${agreementHtml}
+            `;
+            
+            return card;
+        }
+
+        // Fonction pour la synthèse vocale
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Désolé, la synthèse vocale n\'est pas supportée par votre navigateur.');
+            }
+        }
+
+        // Fonction de recherche
+        function searchWords() {
+            const searchTerm = document.querySelector('.search-input').value.toLowerCase();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            let filteredWords = vocabulary;
+            if (searchTerm) {
+                filteredWords = vocabulary.filter(word => 
+                    word.word.toLowerCase().includes(searchTerm) ||
+                    word.nature.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            resultsContainer.innerHTML = '';
+            
+            if (filteredWords.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">Aucun mot trouvé 😕</div>';
+                return;
+            }
+            
+            filteredWords.forEach(word => {
+                const card = createWordCard(word);
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // Fonction pour afficher les mots de la semaine
+        function showWeek(weekNumber) {
+            currentWeek = weekNumber;
+            
+            // Mettre à jour les boutons de semaine
+            const weekButtons = document.querySelectorAll('.week-btn');
+            weekButtons.forEach(btn => btn.classList.remove('active'));
+            weekButtons[weekNumber - 1].classList.add('active');
+            
+            // Filtrer les mots de la semaine
+            const weekWords = vocabulary.filter(word => word.week === weekNumber);
+            const container = document.getElementById('weeklyWords');
+            
+            container.innerHTML = '';
+            
+            if (weekWords.length === 0) {
+                container.innerHTML = '<div class="no-results">Aucun mot pour cette semaine 📅</div>';
+                return;
+            }
+            
+            weekWords.forEach(word => {
+                const card = createWordCard(word);
+                container.appendChild(card);
+            });
+        }
+
+        // Fonction pour basculer l'affichage des champs selon la nature du mot
+        function toggleGenderField() {
+            const nature = document.getElementById('nature').value;
+            const genderGroup = document.getElementById('genderGroup');
+            const pluralGroup = document.getElementById('pluralGroup');
+            const agreementGroup = document.getElementById('agreementGroup');
+            
+            // Afficher le genre pour les noms et adjectifs
+            if (nature === 'nom commun' || nature === 'nom propre' || nature === 'adjectif') {
+                genderGroup.style.display = 'block';
+            } else {
+                genderGroup.style.display = 'none';
+            }
+            
+            // Afficher le pluriel pour les noms
+            if (nature === 'nom commun' || nature === 'nom propre') {
+                pluralGroup.style.display = 'block';
+            } else {
+                pluralGroup.style.display = 'none';
+            }
+            
+            // Afficher l'accord pour les adjectifs
+            if (nature === 'adjectif') {
+                agreementGroup.style.display = 'block';
+            } else {
+                agreementGroup.style.display = 'none';
+            }
+        }
+
+        // Fonction pour ajouter un mot
+        document.getElementById('addWordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const newWord = {
+                word: formData.get('word'),
+                nature: formData.get('nature'),
+                gender: formData.get('gender') || '',
+                plural: formData.get('plural') || '',
+                agreement: formData.get('agreement') || '',
+                week: parseInt(formData.get('week')) || null
+            };
+            
+            // Vérifier si le mot existe déjà
+            const exists = vocabulary.some(word => word.word.toLowerCase() === newWord.word.toLowerCase());
+            if (exists) {
+                alert('Ce mot existe déjà dans le vocabulaire !');
+                return;
+            }
+            
+            // Ajouter le mot à la base de données
+            vocabulary.push(newWord);
+            
+            // Réinitialiser le formulaire
+            e.target.reset();
+            toggleGenderField();
+            
+            alert('Mot ajouté avec succès ! 🎉');
+        });
+
+        // Initialiser l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            searchWords();
+            showWeek(1);
+        });
+    </script>
+</body>
+</html>
