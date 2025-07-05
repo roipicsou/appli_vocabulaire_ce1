@@ -399,6 +399,7 @@
 
     <script>
         // === CONFIGURATION ===
+        const CORS_PROXY = 'https://corsproxy.io/?';
         const GOOGLE_SHEET_API = 'https://script.google.com/macros/s/AKfycbyofQ-RLUo4FiJSAOE5qqm1BwtQdVBFNejuADRkxWCxgZdcmmkp9X6WX6usRQOJwfw/exec'; // <-- Remplacez par l'URL de votre Apps Script déployé
 
         let vocabulary = [];
@@ -407,7 +408,7 @@
         // Charger la liste depuis Google Sheets
         async function loadVocabulary() {
             try {
-                const res = await fetch(GOOGLE_SHEET_API);
+                const res = await fetch(CORS_PROXY + GOOGLE_SHEET_API);
                 vocabulary = await res.json();
             } catch (e) {
                 alert('Erreur de chargement du vocabulaire.');
@@ -418,7 +419,7 @@
         // Ajouter un mot via Google Sheets
         async function addWordToSheet(newWord) {
             const params = new URLSearchParams({ action: 'add', ...newWord });
-            const res = await fetch(GOOGLE_SHEET_API, {
+            const res = await fetch(CORS_PROXY + GOOGLE_SHEET_API, {
                 method: 'POST',
                 body: params
             });
@@ -428,7 +429,7 @@
         // Supprimer un mot via Google Sheets
         async function deleteWordFromSheet(word) {
             const params = new URLSearchParams({ action: 'delete', word });
-            const res = await fetch(GOOGLE_SHEET_API, {
+            const res = await fetch(CORS_PROXY + GOOGLE_SHEET_API, {
                 method: 'POST',
                 body: params
             });
